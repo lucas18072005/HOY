@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materiales Informativos</title>
+    <link rel="stylesheet" href="prueba.css">
+</head>
+<body>
+    <section class="contenedor">
+        <h1>Materiales Informativos</h1>
+        
+        <!-- Barra de búsqueda -->
+        <input type="text" id="busqueda" placeholder="Buscar material..." onkeyup="filtrarTarjetas()">
+        
+        <!-- Formulario para agregar nuevos materiales (con contraseña) -->
+        <form id="formulario">
+            <input type="text" id="nombreMaterial" placeholder="Nombre del material" required>
+            <input type="url" id="enlaceMaterial" placeholder="Enlace de descarga" required>
+            <input type="password" id="contrasena" placeholder="Contraseña (12345)" required>
+            <button type="submit">Agregar Material</button>
+        </form>
+
+        <!-- Grid donde se muestran las tarjetas -->
+        <div class="grid" id="grid"></div>
+    </section>
+
+    <script>
+        // Listas iniciales de nombres y enlaces
+        let nombres = [
+            "Calendario 2024", "Cuadernillo IVE-ILE", "Folleto Casos Críticos", "Folleto Masculinidades",
+            "Folleto IVE ILE", "Recursora de Mesas Locales", "Folleto de Búsquedas", "Folleto de Identidad de Género",
+            "hola", "chura", "martes"
+        ];
+
+        let enlaces = [
+            "https://drive.google.com/uc?export=download&id=1UlgF5eS-6PsKmCiru4BZvZSbgTkgeAjQ",
+            "https://docs.google.com/spreadsheets/d/1wjz-uCe8W801k3-Oxm9ndGpqfXMtvtIVzuGQXDUyikM/edit?usp=drive_link",
+            "https://docs.google.com/spreadsheets/d/1wjz-uCe8W801k3-Oxm9ndGpqfXMtvtIVzuGQXDUyikM/edit?usp=drive_link",
+            "https://docs.google.com/spreadsheets/d/1wjz-uCe8W801k3-Oxm9ndGpqfXMtvtIVzuGQXDUyikM/edit?usp=drive_link",
+            "https://docs.google.com/spreadsheets/d/1wjz-uCe8W801k3-Oxm9ndGpqfXMtvtIVzuGQXDUyikM/edit?usp=drive_link",
+            "https://ejemplo.com/material3", "https://ejemplo.com/material4", "https://ejemplo.com/material500"
+        ];
+
+        const grid = document.getElementById('grid');
+
+        // Función para generar una tarjeta
+        function generarTarjeta(nombre, enlace) {
+            const tarjeta = document.createElement('div');
+            tarjeta.classList.add('tarjeta');
+
+            const titulo = document.createElement('h2');
+            titulo.innerText = nombre;
+            tarjeta.appendChild(titulo);
+
+            const boton = document.createElement('a');
+            boton.innerText = 'Descargar';
+            boton.href = enlace;
+            boton.classList.add('boton');
+            tarjeta.appendChild(boton);
+
+            grid.appendChild(tarjeta);
+        }
+
+        // Recuperar datos almacenados en LocalStorage
+        function cargarMaterialesGuardados() {
+            const nombresGuardados = JSON.parse(localStorage.getItem('nombres'));
+            const enlacesGuardados = JSON.parse(localStorage.getItem('enlaces'));
+
+            if (nombresGuardados && enlacesGuardados) {
+                nombres = nombresGuardados;
+                enlaces = enlacesGuardados;
+            }
+        }
+
+        // Guardar los materiales en LocalStorage
+        function guardarMateriales() {
+            localStorage.setItem('nombres', JSON.stringify(nombres));
+            localStorage.setItem('enlaces', JSON.stringify(enlaces));
+        }
+
+        // Crear las tarjetas iniciales (hasta 550)
+        function generarTarjetasIniciales() {
+            for (let i = 0; i < 550; i++) {
+                const nombre = nombres[i] || `Material ${i + 1}`; // Si no hay nombre, se asigna 'Material X'
+                const enlace = enlaces[i] || "#"; // Si no hay enlace, se deja como '#'
+                generarTarjeta(nombre, enlace);
+            }
+        }
+
+        // Filtrar tarjetas según búsqueda
+        function filtrarTarjetas() {
+            const input = document.getElementById('busqueda').value.toLowerCase();
+            const tarjetas = document.querySelectorAll('.tarjeta');
+
+            tarjetas.forEach(tarjeta => {
+                const titulo = tarjeta.querySelector('h2').innerText.toLowerCase();
+                if (titulo.includes(input)) {
+                    tarjeta.style.display = 'block';
+                } else {
+                    tarjeta.style.display = 'none';
+                }
+            });
+        }
+
+        // Evento para agregar un nuevo material desde el formulario
+        const formulario = document.getElementById('formulario');
+        formulario.addEventListener('submit', function(event) {
+            event.preventDefault();  // Evita que el formulario recargue la página
+
+            // Obtener valores del formulario
+            const nombre = document.getElementById('nombreMaterial').value;
+            const enlace = document.getElementById('enlaceMaterial').value;
+            const contrasena = document.getElementById('contrasena').value;
+
+            // Verificar la contraseña
+            if (contrasena === '12345') {
+                // Agregar a las listas de materiales
+                nombres.push(nombre);
+                enlaces.push(enlace);
+
+                // Generar la nueva tarjeta
+                generarTarjeta(nombre, enlace);
+
+                // Guardar los materiales en LocalStorage
+                guardarMateriales();
+
+                // Limpiar los campos del formulario
+                formulario.reset();
+                alert("Material agregado exitosamente.");
+            } else {
+                alert("Contraseña incorrecta. No se pudo agregar el material.");
+            }
+        });
+
+        // Cargar los materiales desde LocalStorage y generar las tarjetas
+        cargarMaterialesGuardados();
+        generarTarjetasIniciales();
+    </script>
+</body>
+</html>
